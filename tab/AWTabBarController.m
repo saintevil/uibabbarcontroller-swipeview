@@ -19,7 +19,7 @@
 
 #define X_OFFSET 0 // for some reason there's a little bit of a glitchy offset.  I'm going to look for a better workaround in the future
 
-@interface AWTabBarController ()
+@interface AWTabBarController () <UITabBarControllerDelegate>
 @property (strong, nonatomic) UIView * tabBarView;
 @property (strong, nonatomic) UIView * selectionBar;
 
@@ -35,6 +35,7 @@
         gesture.maximumNumberOfTouches = 1;
         [vc.view addGestureRecognizer:gesture];
     }
+    self.delegate = self;
 }
 
 - (void)didReceiveMemoryWarning {
@@ -55,6 +56,10 @@
     if (_tabBarView) {
         [_tabBarView removeFromSuperview];
         _tabBarView = nil;
+    }
+    if (_selectionBar) {
+        [_selectionBar removeFromSuperview];
+        _selectionBar = nil;
     }
     [self setupSegmentButtons];
 }
@@ -225,6 +230,7 @@
     }
     else {
         [super setSelectedIndex:selectedIndex];
+        [self moveSelectionBar:CGPointZero];
     }
 }
 
@@ -249,9 +255,12 @@
 -(void)setupSegmentButtons
 {
     if ([_customSegmentButtons count] == 0) {
-        if (_tabBarView) {
-            [_tabBarView removeFromSuperview];
-            _tabBarView = nil;
+        if (_tabBarView == nil) {
+            UITabBar * parentView = self.tabBar;
+            _tabBarView = [[UIView alloc] initWithFrame:parentView.bounds];
+            _tabBarView.backgroundColor = [UIColor clearColor];
+            [parentView addSubview:_tabBarView];
+            [self setupSelector];
         }
     }
     else {
@@ -260,6 +269,7 @@
 
         if (_tabBarView == nil) {
             _tabBarView = [[UIView alloc] initWithFrame:parentView.bounds];
+            _tabBarView.backgroundColor = [UIColor clearColor];
 
             NSInteger i = 0;
             for (UIButton * button in _customSegmentButtons) {
@@ -271,6 +281,7 @@
             [parentView addSubview:_tabBarView];
 
             [(UIButton*)[_customSegmentButtons objectAtIndex:self.selectedIndex] setSelected:YES];
+            [self setupSelector];
         }
         NSInteger i = 0;
         for (UIButton * btn in _customSegmentButtons) {
@@ -278,7 +289,6 @@
             i++;
         }
     }
-    [self setupSelector];
 }
 
 // sets up the selection bar under the buttons on the navigation bar
@@ -292,14 +302,20 @@
             _selectionBar.backgroundColor = [UIColor greenColor]; // sbcolor
         }
         _selectionBar.alpha = 0.8; // sbalpha
-        [self.tabBar addSubview:_selectionBar];
+        [_tabBarView addSubview:_selectionBar];
     }
 
     CGPoint center = _selectionBar.center;
     center.x += self.selectedIndex*(self.view.frame.size.width-2*X_BUFFER)/[self.childViewControllers count];
     _selectionBar.center = center;
-
 }
+
+#pragma mark -
+#pragma mark UITabBarControllerDeleagte
+- (void)tabBarController:(UITabBarController *)tabBarController didSelectViewController:(UIViewController *)viewController {
+    [self moveSelectionBar:CGPointZero];
+}
+
 
 @end
 

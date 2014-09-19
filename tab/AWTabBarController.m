@@ -108,8 +108,8 @@
         rightView.frame = [self frameForNextViewWithTranslate:translate];
         [self moveSelectionBar:translate];
     } else if (gesture.state == UIGestureRecognizerStateCancelled ||
-        gesture.state == UIGestureRecognizerStateEnded ||
-        gesture.state == UIGestureRecognizerStateFailed) {
+               gesture.state == UIGestureRecognizerStateEnded ||
+               gesture.state == UIGestureRecognizerStateFailed) {
         CGPoint velocity = [gesture velocityInView:gesture.view];
         // figure out if we've moved (or flicked) more than 50% the way across
         if (translate.x > 0.0 && (translate.x + velocity.x * 0.25) > (gesture.view.bounds.size.width / 2.0) && leftView) {
@@ -177,7 +177,7 @@
     }
     else {
         self.selectedIndex = button.tag;
-        
+
         [UIView animateWithDuration:ANIMATION_SPEED
                               delay:0.0
                             options:UIViewAnimationOptionCurveEaseOut
@@ -255,13 +255,11 @@
 -(void)setupSegmentButtons
 {
     if ([_customSegmentButtons count] == 0) {
-        if (_tabBarView == nil) {
-            UITabBar * parentView = self.tabBar;
-            _tabBarView = [[UIView alloc] initWithFrame:parentView.bounds];
-            _tabBarView.backgroundColor = [UIColor clearColor];
-            [parentView addSubview:_tabBarView];
-            [self setupSelector];
+        if (_tabBarView) {
+            [_tabBarView removeFromSuperview];
+            _tabBarView = nil;
         }
+        [self setupSelector];
     }
     else {
         UITabBar * parentView = self.tabBar;
@@ -270,16 +268,16 @@
         if (_tabBarView == nil) {
             _tabBarView = [[UIView alloc] initWithFrame:parentView.bounds];
             _tabBarView.backgroundColor = [UIColor clearColor];
-
+            
             NSInteger i = 0;
             for (UIButton * button in _customSegmentButtons) {
                 button.tag = i++;
                 [button addTarget:self action:@selector(tapSegmentButtonAction:) forControlEvents:UIControlEventTouchUpInside];
-
+                
                 [_tabBarView addSubview:button];
             }
             [parentView addSubview:_tabBarView];
-
+            
             [(UIButton*)[_customSegmentButtons objectAtIndex:self.selectedIndex] setSelected:YES];
             [self setupSelector];
         }
@@ -302,9 +300,14 @@
             _selectionBar.backgroundColor = [UIColor greenColor]; // sbcolor
         }
         _selectionBar.alpha = 0.8; // sbalpha
-        [_tabBarView addSubview:_selectionBar];
+        if (_tabBarView) {
+            [_tabBarView addSubview:_selectionBar];
+        }
+        else {
+            [self.tabBar addSubview:_selectionBar];
+        }
     }
-
+    
     CGPoint center = _selectionBar.center;
     center.x += self.selectedIndex*(self.view.frame.size.width-2*X_BUFFER)/[self.childViewControllers count];
     _selectionBar.center = center;

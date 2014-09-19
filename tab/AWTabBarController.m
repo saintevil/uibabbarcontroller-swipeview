@@ -253,29 +253,30 @@
             [_tabBarView removeFromSuperview];
             _tabBarView = nil;
         }
-        return;
     }
-    UITabBar * parentView = self.tabBar;
-    NSInteger numControllers = [self.childViewControllers count];
+    else {
+        UITabBar * parentView = self.tabBar;
+        NSInteger numControllers = [self.childViewControllers count];
 
-    if (_tabBarView == nil) {
-        _tabBarView = [[UIView alloc] initWithFrame:parentView.bounds];
+        if (_tabBarView == nil) {
+            _tabBarView = [[UIView alloc] initWithFrame:parentView.bounds];
 
-        NSInteger i = 0;
-        for (UIButton * button in _customSegmentButtons) {
-            button.tag = i++;
-            [button addTarget:self action:@selector(tapSegmentButtonAction:) forControlEvents:UIControlEventTouchUpInside];
+            NSInteger i = 0;
+            for (UIButton * button in _customSegmentButtons) {
+                button.tag = i++;
+                [button addTarget:self action:@selector(tapSegmentButtonAction:) forControlEvents:UIControlEventTouchUpInside];
 
-            [_tabBarView addSubview:button];
+                [_tabBarView addSubview:button];
+            }
+            [parentView addSubview:_tabBarView];
+
+            [(UIButton*)[_customSegmentButtons objectAtIndex:self.selectedIndex] setSelected:YES];
         }
-        [parentView addSubview:_tabBarView];
-
-        [(UIButton*)[_customSegmentButtons objectAtIndex:self.selectedIndex] setSelected:YES];
-    }
-    NSInteger i = 0;
-    for (UIButton * btn in _customSegmentButtons) {
-        btn.frame = CGRectMake(X_BUFFER+i*(self.view.frame.size.width-2*X_BUFFER)/numControllers-X_OFFSET, Y_BUFFER, (self.view.frame.size.width-2*X_BUFFER)/numControllers, parentView.frame.size.height);
-        i++;
+        NSInteger i = 0;
+        for (UIButton * btn in _customSegmentButtons) {
+            btn.frame = CGRectMake(X_BUFFER+i*(self.view.frame.size.width-2*X_BUFFER)/numControllers-X_OFFSET, Y_BUFFER, (self.view.frame.size.width-2*X_BUFFER)/numControllers, parentView.frame.size.height);
+            i++;
+        }
     }
     [self setupSelector];
 }

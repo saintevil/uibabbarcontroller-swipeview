@@ -292,7 +292,7 @@
 // sets up the selection bar under the buttons on the navigation bar
 -(void)setupSelector {
     if (_selectionBar == nil) {
-        _selectionBar = [[UIView alloc] initWithFrame:CGRectMake(X_BUFFER-X_OFFSET, SELECTOR_Y_BUFFER,(self.view.frame.size.width-2*X_BUFFER)/[self.childViewControllers count], SELECTOR_HEIGHT)];
+        _selectionBar = [[UIView alloc] init];
         if (_selectedSegmentColor) {
             _selectionBar.backgroundColor = _selectedSegmentColor;
         }
@@ -307,10 +307,8 @@
             [self.tabBar addSubview:_selectionBar];
         }
     }
+    _selectionBar.frame = CGRectMake(X_BUFFER-X_OFFSET, SELECTOR_Y_BUFFER,(self.view.frame.size.width-2*X_BUFFER)/[self.childViewControllers count], SELECTOR_HEIGHT);
     
-    CGPoint center = _selectionBar.center;
-    center.x += self.selectedIndex*(self.view.frame.size.width-2*X_BUFFER)/[self.childViewControllers count];
-    _selectionBar.center = center;
 }
 
 #pragma mark -
